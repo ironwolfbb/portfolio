@@ -91,7 +91,28 @@ if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
                             <div class="col-xl-3 col-lg-3 d-none d-lg-block">
                                 <div class="Appointment">
                                     <div class="phone_num d-none d-xl-block">
-                                        <a href="#">Log in</a>
+                                    <?$APPLICATION->IncludeComponent(
+	"bitrix:sale.basket.basket.line",
+	"",
+	Array(
+		"HIDE_ON_BASKET_PAGES" => "Y",
+		"PATH_TO_AUTHORIZE" => "/auth/personal.php",
+		"PATH_TO_BASKET" => SITE_DIR."personal/cart/",
+		"PATH_TO_ORDER" => SITE_DIR."personal/order/make/",
+		"PATH_TO_PERSONAL" => SITE_DIR."personal/",
+		"PATH_TO_PROFILE" => "/auth/personal.php",
+		"PATH_TO_REGISTER" => "/auth/registration.php",
+		"POSITION_FIXED" => "N",
+		"SHOW_AUTHOR" => "Y",
+		"SHOW_EMPTY_VALUES" => "Y",
+		"SHOW_NUM_PRODUCTS" => "Y",
+		"SHOW_PERSONAL_LINK" => "Y",
+		"SHOW_PRODUCTS" => "N",
+		"SHOW_REGISTRATION" => "Y",
+		"SHOW_TOTAL_PRICE" => "Y"
+	)
+);?>
+                                        <a href="#"></a>
                                     </div>
                                     <div class="d-none d-lg-block">
                                         <a class="boxed-btn3" href="#">Post a Job</a>

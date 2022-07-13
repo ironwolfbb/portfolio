@@ -6,7 +6,7 @@ use \Bitrix\Main\Application;
 
 if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true) die();
 
-class AddCommentsComponent extends CBitrixComponent
+class FeedComponent extends CBitrixComponent
 {
     private $_request;
 
@@ -29,7 +29,7 @@ class AddCommentsComponent extends CBitrixComponent
      */
     public function onPrepareComponentParams($arParams)
     {
-        /*  echo '<pre>';
+        /*   echo '<pre>';
         print_r($arParams);
         echo '</pre>'; */
 
@@ -42,8 +42,6 @@ class AddCommentsComponent extends CBitrixComponent
     /**
      * Точка входа в компонент. То есть он сюда первым делом зайдет
      */
-
-
     public function executeComponent()
     {
 
@@ -58,35 +56,33 @@ class AddCommentsComponent extends CBitrixComponent
 
         // Тут нужно написать GET_LIST на получение записей из инфоблока КОММЕНТАРИИ и отфильтровать по св-ву привязка к элементу инфоблока что
         // бы мы получили только комментарии привязанные к этой новости
-        global $USER;
-        $PROP = [];
-        $PROP[28] = $_GET['ELEMENT_ID'];
-        $PROP[29] = $USER->GetID();
-        if (isset($_POST['send'])) {
-            $el = new CIBlockElement;
-            $arLoadProductArray = [
-                "IBLOCK_SECTION_ID" => false,          // элемент лежит в корне раздела
-                "IBLOCK_ID"      => $this->arParams['IBLOCK_ID'],
-                "IBLOCK_TYPE_ID" => "News",
-                "IBLOCK_CODE" => "Comments",
-                "NAME"           => $_POST['name'],
-                "CODE" => $_POST['name'],
-                "ACTIVE"         => "Y",            // активен
-                "PREVIEW_TEXT"   => $_POST['comment'],
-                "PROPERTY_VALUES" => $PROP,
-                /*  "DETAIL_TEXT"    => "текст для детального просмотра", */
+
+        $res = CIBlockElement::GetList(
+            [],
+            ["IBLOCK_ID" =>  $this->arParams['IBLOCK_ID']],
+
+        );
+
+        while ($arrayToTemplate = $res->GetNextElement()) {
+            $arFields = $arrayToTemplate->GetFields();
+           /*  echo "<pre>";
+            print_r($arFields);
+            echo "</pre>"; */
+            $arrayToTemplate2[] = [
+                'DETAIL_PAGE_URL' => $arFields['DETAIL_PAGE_URL'],
+                'IBLOCK_ID' => $arFields['IBLOCK_ID'],
+                'ID' => $arFields['ID'],
+                'PREVIEW_PICTURE' => CFile::GetPath($arFields['PREVIEW_PICTURE']),
+                'COMMENT_TEXT' => $arFields['PREVIEW_TEXT'], // или DETAIL_TEXT смотря где в инфоблоке решил хранить текст комментария
+                'DATE_CREATE' => $arFields['DATE_CREATE'],
+                'USER' => $arFields['CREATED_USER_NAME'],
             ];
-           
-            $el->Add($arLoadProductArray);
-            /*     echo "New ID: " . $PRODUCT_ID;
-            }else{
-                echo "Error: " . $el->LAST_ERROR;
-            } */
         }
-        
+
 
         // $arrayToTemplate - это массив со всеми комментариями, давай сформируем arResult который затем будет доступен в template.php
-        /*  $this->arResult['ITEMS'] = $arrayToTemplate2; */
+        $this->arResult['ITEMS'] = $arrayToTemplate2;
+
 
         // Шагом выше ты сам заполнил ITEMS и теперь в template.php можешь делать foreach($arResult) и выводить элементы
         // что-то делаем и результаты работы помещаем в arResult, для передачи в шаблон
